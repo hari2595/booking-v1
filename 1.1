@@ -1,0 +1,104 @@
+import sqlite3
+
+
+#CONNECTING DB
+connection = sqlite3.connect("movieapp.db")
+
+# creating class for login
+class movieclass:
+    def __init__(self):
+        self.login = False
+
+# Registering user
+    def registerUser(userName, userType, password):
+
+        conditions = True
+        cursor = connection.cursor()
+        cursor.execute("INSERT INTO userTable (userName, userType, password) values ('{}', '{}', '{}');".format(userName, userType, password))
+        cursor.execute("COMMIT;")
+        print("Successfully created")
+
+# Login module
+    def userLogin(userNamea, passworda):
+        conditions = True
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM userTable WHERE  userName=:userNamea AND password =:passb", {"userNamea": userNamea, "passb": passworda})
+        myData = cursor.fetchall()
+        for x in myData:
+            currentUserName = myData[0][1]
+            currentUserType = myData[0][2]
+
+        if currentUserType == "USER":
+            print("Welcome " + currentUserName)
+            print(".")
+            print("Your current bookings are:")
+            movieclass.listUserBooking(currentUserName)
+            print("Movies available:")
+            movieclass.listMovie("data")
+            print(".")
+            print("Please make your booking :::")
+            userMovieName = str(input("Enter movie name:"))
+            userMovieTime = str(input("Enter booking time:"))
+            movieclass.bookMovie(currentUserName, userMovieName, userMovieTime)
+
+        else:
+            print("Welcome admin:")
+            movieName = str(input("Enter movie name:"))
+            movieclass.registerMovie(movieName)
+
+
+
+
+    def registerMovie(movieNamea):
+
+        conditions = True
+        cursor = connection.cursor()
+        cursor.execute("INSERT INTO movieTable (name) values ('{}');".format(movieNamea))
+        cursor.execute("COMMIT;")
+        print("Successfully created")
+
+    def listUserBooking(currentUser):
+        conditions = True
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM bookingTable WHERE user=:userNamea ", {"userNamea": currentUser})
+        movieData = cursor.fetchall()
+        print(movieData)
+
+    def listMovie(datass):
+        conditions = True
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM movieTable")
+        movieData = cursor.fetchall()
+        print(movieData)
+
+    def bookMovie(userData, movie, bookingTime):
+        conditions = True
+        cursor = connection.cursor()
+        cursor.execute("INSERT INTO bookingTable (user, bookingTime, movieName) values ('{}', '{}', '{}');".format(userData, bookingTime,movie))
+        cursor.execute("COMMIT;")
+        print("Successfully created")
+
+#mainblock
+if __name__ == "__main__":
+    while True:
+        print("Welcome to my app:")
+        print("1. New user")
+        print("2. Existing user")
+        user = int(input("Select your option:"))
+
+        if user == 1:
+            print("Creating a new account:")
+            userName = input("Enter USER NAME:")
+            userType = input("Enter USER TYPE:")
+            password = input("Enter PASSWORD:")
+            movieclass.registerUser(userName, userType, password)
+            continue
+
+        if user == 2:
+            print("Enter user id and password")
+            userNamea = input("Enter username:")
+            passworda = input("Enter password:")
+
+            movieclass.userLogin(userNamea, passworda)
+
+
